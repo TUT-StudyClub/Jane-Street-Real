@@ -1,4 +1,8 @@
-# -*- coding: utf-8 -*-
+"""
+=========================
+Data loading and preprocessing
+=========================
+"""
 import kagglehub
 kagglehub.login()
 
@@ -52,16 +56,11 @@ import kaggle_evaluation.jane_street_inference_server
 
 gridColor = 'lightgrey'
 
-"""We can see that two files (0 and 1) has a total of 4 748 457 rows.
-I have used pandas to load it and it took almost 9 sec. Th ere are a total of 339 days  (about one years of trading data).
-
-# <div id='eda'  style="color:white;   font-weight:bold; font-size:120%; text-align:center;padding:12.0px; background:black"> TIME SERIES ANALYSIS AND EDA</div>
-
-<a href="#list-tab" class="btn btn-success btn-lg active" role="button" aria-pressed="true" style="color:Blue; font-size:140%; background:lightgrey;  font-weight:bold; " data-toggle="popover" title="go to Colors">GO BACK</a>
-
-Let us take a look at the target values over time (for  `symbol_id`=1)
 """
-
+=========================
+Time series analysis and EDA
+=========================
+"""
 train =sample_df
 train['N']=train.index.values
 train['id']=train.index.values
@@ -78,8 +77,6 @@ plt.grid(color = gridColor , linewidth=0.8)
 plt.axhline(0, color='red', linestyle='-', linewidth=1.2)
 plt.show()
 
-"""Let us take a look at the cumulative values of response over time"""
-
 #for symbol_id=1
 plt.figure(figsize=(14, 4))
 plt.plot(xx,yy.cumsum(), color = 'black', linewidth =0.6)
@@ -92,8 +89,6 @@ plt.grid(color = gridColor)
 #plt.grid(color = 'lightblue')
 plt.axhline(0, color='red', linestyle='-', linewidth=0.7)
 plt.show()
-
-"""Now let's compare this responder (6) with other responders"""
 
 # for symbol_id == 0
 plt.figure(figsize=(18, 7))
@@ -116,11 +111,6 @@ plt.legend(predictor_cols)
 sns.despine()
 #plt.show()
 
-"""- We can see that `resp6` (red) most closely follows `resp0` and `resp3`
-
-Let's build a correlation matrix and see it numerically.
-"""
-
 plt.figure(figsize=(6, 6))
 responders = pd.read_csv(f"{path}/responders.csv")
 matrix = responders[[ f"tag_{no}" for no in range(0,5,1) ] ].T.corr()
@@ -129,8 +119,6 @@ sns.heatmap(matrix, square=True, cmap="coolwarm", alpha =0.9, vmin=-1, vmax=1, c
 plt.xlabel("Responder_0 - Responder_8")
 plt.ylabel("Responder_0 - Responder_8")
 plt.show()
-
-"""Let us take a look at the returns and cumulative daily returns, and disribution of returns for all responders"""
 
 df_train=sample_df
 s_id = 0                        # Change params to take a look at other symbols
@@ -172,11 +160,6 @@ fig.patch.set_edgecolor('#000000')
 fig.patch.set_facecolor('#eeeeee')
 plt.show()
 
-"""We can see that responders have different behavior and distributions.
-
-Let us now study the behavior of `responder 6`  for different `symbol_id`
-"""
-
 res_columns = [col for col in df_train.columns if re.match("responder_", col)]
 row=10
 fig, axs = plt.subplots(figsize=(18, 5*row))
@@ -215,18 +198,6 @@ fig.patch.set_edgecolor('#000000')
 fig.patch.set_facecolor('#eeeeee')
 plt.show()
 
-"""- We see that the behavior and distribution of one `responder 6` is  different for different `symbol_id`
-
-Now let's study the data in more detail and then continue diving into time series analysis
-
-## Files and variables overview
-
-### Features.csv
-features.csv - metadata pertaining to the anonymized features
-
-#### Features have many missing values.
-"""
-
 df_train = sample_df
 plt.figure(figsize=(20, 3))    # Plot missing values
 plt.bar(x=df_train.isna().sum().index, height=df_train.isna().sum().values, color="red", label='missing')   # analog: using missingno
@@ -236,15 +207,8 @@ plt.grid()
 plt.legend()
 plt.show()
 
-"""- Some columns are not very useful in our sample (either Null or show the partition number).
-
-#### Structure of features:
-"""
-
 features = pd.read_csv(f"{path}/features.csv")
 features
-
-"""#### Tags visualizing:"""
 
 plt.figure(figsize=(18, 6))
 plt.imshow(features.iloc[:, 1:].T.values, cmap="gray_r")
@@ -255,28 +219,17 @@ plt.xticks(np.arange(79))
 plt.grid(color = 'lightgrey')
 plt.show()
 
-"""#### Correlation matrix between feature_XX and feature_YY"""
-
 plt.figure(figsize=(11, 11))
 matrix = features[[ f"tag_{no}" for no in range(0,17,1) ] ].T.corr()
 sns.heatmap(matrix, square=True, cmap="coolwarm", alpha =0.9, vmin=-1, vmax=1, center= 0, linewidths=0.5, linecolor='white')
 plt.show()
 
-"""### Responders.csv
-responders.csv - metadata pertaining to the anonymized responders
-#### Structure of responders:
-"""
 
 responders = pd.read_csv(f"{path}/responders.csv")
 responders
 
-"""### Weights
-#### Basic stats:
-"""
 
 sample_df['weight'].describe().round(1)
-
-""">"""
 
 plt.figure(figsize=(8,3))
 plt.hist(sample_df['weight'], bins=30, color='grey', edgecolor = 'white',density=True )
@@ -285,44 +238,17 @@ plt.grid(color = 'lightgrey', linewidth=0.5)
 plt.axvline(1.7, color='red', linestyle='-', linewidth=0.7)
 plt.show()
 
-"""### Sample submission.csv
-sample_submission.csv - This file illustrates the format of the predictions your model should make.
-"""
 
 sub = pd.read_csv(f"{path}/sample_submission.csv")
 print( f"shape = {sub.shape}" )
 sub.head(10)
 
-"""### Train.parquet
-
-- **train.parquet** - The training set, contains historical data and returns. For convenience, the training set has been partitioned into ten parts.
-  - `date_id` and `time_id` - Integer values that are ordinally sorted, providing a chronological structure to the data, although the actual time intervals between `time_id` values may vary.
-  - `symbol_id` - Identifies a unique financial instrument.
-  - `weight` - The weighting used for calculating the scoring function.
-  - `feature_{00...78}` - Anonymized market data.
-  - `responder_{0...8}` - Anonymized responders clipped between -5 and 5. The `responder_6` field is what you are trying to predict.
-  
-  
-Each row in the `{train/test}.parquet` dataset corresponds to a unique combination of a symbol (identified by `symbol_id`) and a timestamp (represented by `date_id` and `time_id`). You will be provided with multiple responders, with `responder_6` being the only responder used for scoring. The date_id column is an integer which represents the day of the event, while `time_id` represents a time ordering. It's important to note that the real time differences between each time_id are not guaranteed to be consistent.
-
-- The `symbol_id` column contains encrypted identifiers. Each `symbol_id` is not guaranteed to appear in all `time_id` and `date_id` combinations.
-- Additionally, new `symbol_id` values **may appear in future** test sets.est sets.
-
-## Responders: analysis, statistics and distributions
-"""
 
 col =[]
 for i in range(9):
     col.append(f"responder_{i}")
 
 sample_df[col].describe().round(1)
-
-"""#### Interesting fact:
-- The values ​​of all variables are strictly within the range of `[-5, 5]`
-
-#### Responders-Responder distributions
-Let's dive deeper into the relationships between respondents and plot mutual distributions between 'reps 6' and other responders
-"""
 
 numerical_features=[]
 numerical_features=sample_df.filter(regex='^responder_').columns.tolist() # Separate responders
@@ -348,10 +274,6 @@ fig.patch.set_edgecolor('#000000')
 fig.patch.set_facecolor('#eeeeee')
 
 plt.show()
-
-"""#### Responder6-Features distributions
-Now let's plot mutual distributions between 'reps 6' and some features
-"""
 
 numerical_features=[]
 for i in ['05', '06', '07', '08', '12', '15', '19', '32', '38', '39', '50', '51', '65', '66', '67']:
@@ -412,16 +334,12 @@ for i in numerical_features[:-1]:
             plt.show()
             plt.figure(figsize=(15, 4))
 
-"""- There are many nonlinear and non-trivial distributions
 
-# <div id='model'  style="color:white;   font-weight:bold; font-size:120%; text-align:center;padding:12.0px; background:black">MODELLING</div>
-
-<a href="#list-tab" class="btn btn-success btn-lg active" role="button" aria-pressed="true" style="color:Blue; font-size:140%; background:lightgrey;  font-weight:bold; " data-toggle="popover" title="go to Colors">GO BACK</a>
-
-This is jsut a first approach to modelling and experiment
-Setting of ensemble:
 """
-
+=========================
+Modelling
+=========================
+"""
 ENSEMBLE_SOLUTIONS = ['SOLUTION_14','SOLUTION_5']
 OPTION,__WTS = 'option 91',[0.899, 0.28]
 
@@ -442,9 +360,6 @@ def predict(test:pl.DataFrame, lags:pl.DataFrame | None) -> pl.DataFrame | pd.Da
     predictions = predictions.with_columns(pl.Series('responder_6', pred.ravel()))
     return predictions
 
-""" 5. [JS Ridge baseline](https://www.kaggle.com/code/yunsuxiaozi/js-ridge-baseline) Lb=0.0026
- [yunsuxiaozi](https://www.kaggle.com/yunsuxiaozi)
-"""
 
 if 'SOLUTION_5' in ENSEMBLE_SOLUTIONS:
 
@@ -463,13 +378,6 @@ if 'SOLUTION_5' in ENSEMBLE_SOLUTIONS:
     import joblib
     model_5 = joblib.load('/kaggle/input/jane-street-5-and-7_/other/default/1/ridge_model_5(1).pkl')
 
-"""14. [Jane Street RMF NN + XGB](https://www.kaggle.com/code/voix97/jane-street-rmf-nn-xgb), Lb=0.0056
- [Xiang Sheng](https://www.kaggle.com/voix97)
-
-### NN + XGB inference
-
-### Configurations
-"""
 
 if 'SOLUTION_14' in ENSEMBLE_SOLUTIONS:
 
@@ -492,8 +400,6 @@ if 'SOLUTION_14' in ENSEMBLE_SOLUTIONS:
         f"/kaggle/input/js24-preprocessing-create-lags/validation.parquet/"
     ).collect().to_pandas()
 
-"""### Load model"""
-
 if 'SOLUTION_14' in ENSEMBLE_SOLUTIONS:
 
     xgb_model = None
@@ -503,9 +409,6 @@ if 'SOLUTION_14' in ENSEMBLE_SOLUTIONS:
         xgb_model = result["model"]
 
     xgb_feature_cols = ["symbol_id", "time_id"] + CONFIG.feature_cols
-
-    # Show model
-    #display(xgb_model)
 
 if 'SOLUTION_14' in ENSEMBLE_SOLUTIONS:
 
@@ -679,20 +582,13 @@ if 'SOLUTION_14' in ENSEMBLE_SOLUTIONS:
             )
         )
 
-        # The predict function must return a DataFrame
-        #assert isinstance(predictions, pl.DataFrame | pd.DataFrame)
-        # with columns 'row_id', 'responer_6'
-        #assert list(predictions.columns) == ['row_id', 'responder_6']
-        # and as many rows as the test data.
-        #assert len(predictions) == len(test)
-
         return predictions_14
 
-"""# <div id='sub'  style="color:white;   font-weight:bold; font-size:120%; text-align:center;padding:12.0px; background:black">SUB TO SERVER</div>
-
-<a href="#list-tab" class="btn btn-success btn-lg active" role="button" aria-pressed="true" style="color:Blue; font-size:140%; background:lightgrey;  font-weight:bold; " data-toggle="popover" title="go to Colors">GO BACK</a>
 """
-
+=========================
+Sub to server
+=========================
+"""
 inference_server = kaggle_evaluation.jane_street_inference_server.JSInferenceServer(predict)
 
 if os.getenv('KAGGLE_IS_COMPETITION_RERUN'):
