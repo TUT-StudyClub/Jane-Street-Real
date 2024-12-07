@@ -3,10 +3,14 @@
 Modelling
 =========================
 """
-ENSEMBLE_SOLUTIONS = ['SOLUTION_14','SOLUTION_5']
-OPTION,__WTS = 'option 91',[0.899, 0.28]
 
-def predict(test:pl.DataFrame, lags:pl.DataFrame | None) -> pl.DataFrame | pd.DataFrame:
+# アンサンブルの設定定義
+ENSEMBLE_SOLUTIONS = ['SOLUTION_14','SOLUTION_5']
+OPTION,__WTS = 'option 91',[0.899, 0.28] # アンサンブルの各SOLUTIONの重み設定
+
+# 各手法の予測関数
+def predict(test:pl.DataFrame, lags:
+            DataFrame | None) -> pl.DataFrame | pd.DataFrame:
     pdB = predict_14(test,lags).to_pandas()
     pdC = predict_5 (test,lags).to_pandas()
 
@@ -36,6 +40,7 @@ if 'SOLUTION_5' in ENSEMBLE_SOLUTIONS:
         predictions = predictions.with_columns(pl.Series('responder_6', test_preds.ravel()))
         return predictions
 
+# SOLUTIONS5のモデルの読み込み
 if 'SOLUTION_5' in ENSEMBLE_SOLUTIONS:
     from sklearn.linear_model import BayesianRidge
     import joblib
