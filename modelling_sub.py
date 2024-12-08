@@ -5,6 +5,10 @@ Modelling
 """
 
 # アンサンブルの設定定義
+"""
+SOLUTION_14=NN(ニューラルネットワーク), XGBoost
+SOLUTION_5=リッジ回帰
+"""
 ENSEMBLE_SOLUTIONS = ['SOLUTION_14','SOLUTION_5']
 OPTION,__WTS = 'option 91',[0.899, 0.28] # アンサンブルの各SOLUTIONの重み設定
 

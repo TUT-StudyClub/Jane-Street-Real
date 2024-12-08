@@ -7,15 +7,6 @@ train =sample_df
 train['N']=train.index.values
 train['id']=train.index.values
 
-df_train=sample_df
-
-features = pd.read_csv(f"{path}/features.csv")
-features
-
-responders = pd.read_csv(f"{path}/responders.csv")
-responders
-
-
 sample_df['weight'].describe().round(1)
 
 sub = pd.read_csv(f"{path}/sample_submission.csv")
